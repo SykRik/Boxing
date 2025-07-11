@@ -322,7 +322,7 @@ namespace Boxing
         private void OnOpponentDefeated(PlayerController opponent)
         {
             if (gameMode == GameMode.StressTest25) return;
-            var allOpponentsDefeated = players.Count == players.Count(x => !x.IsAlive);
+            var allOpponentsDefeated = opponents.Count == players.Count(x => !x.IsAlive);
             if (allOpponentsDefeated)
             {
                 OnFightResult(true); // Người chơi thắng
