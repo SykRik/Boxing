@@ -82,6 +82,6 @@ MonoBehaviour:
   - {fileID: 7211577561630468249, guid: a389451827f7c29409b3feb7eb971647, type: 3}
   modelHolder: {fileID: 4319906035023609602}
   PlayerName: 
-  MaxHP: 20
-  MaxMana: 10
+  MaxHP: 100
+  MaxMana: 100
   xxx: 0
