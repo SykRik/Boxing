@@ -158,6 +158,9 @@ namespace Boxing
 
                         p1.Initialize(p2);
                         p2.Initialize(p1);
+
+                        players.Add(p1);
+                        opponents.Add(p2);
                     }
                     break;
             }
