@@ -1,9 +1,13 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 namespace Boxing
 {
     public class PlayerController : MonoBehaviour, ICombatant
     {
+        public List<GameObject> prefabs = new();
+        public GameObject modelHolder = null;
+
         public string PlayerName;
         public int MaxHP = 40;
         public int MaxMana = 200;
@@ -28,6 +32,12 @@ namespace Boxing
 
         void Awake()
         {
+            var random = Random.Range(0, 100) % prefabs.Count;
+            var model = GameObject.Instantiate(prefabs[random]);
+            model.transform.SetParent(modelHolder.transform);
+            model.transform.localPosition = Vector3.zero;
+            model.transform.localRotation = Quaternion.identity;
+
             FSM = new PlayerFSM(this);
             Animator = GetComponentInChildren<Animator>();
             HP = MaxHP;
