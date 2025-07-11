@@ -5,8 +5,8 @@ namespace Boxing
     public class PlayerController : MonoBehaviour, ICombatant
     {
         public string PlayerName;
-        public int MaxHP = 20;
-        public int MaxMana = 100;
+        public int MaxHP = 40;
+        public int MaxMana = 200;
 
         public int HP { get; private set; }
         public int Mana { get; private set; }
@@ -16,7 +16,7 @@ namespace Boxing
 
         public PlayerFSM FSM { get; set; }
         public InputQueue InputQueue { get; set; } = new InputQueue();
-        public CombatAction CurrentAction { get; private set; }   // ✅ Đã implement
+        public CombatAction CurrentAction { get; private set; }
 
         private PlayerController opponent;
         private IInputSource inputSource;
@@ -24,8 +24,11 @@ namespace Boxing
         private float gameTimer = 0f;
         private float manaTimer = 0f;
 
+        public System.Action<PlayerController> OnDefeated;
+
         void Awake()
         {
+            FSM = new PlayerFSM(this);
             Animator = GetComponentInChildren<Animator>();
             HP = MaxHP;
             Mana = MaxMana;
@@ -34,8 +37,6 @@ namespace Boxing
         public void Initialize(PlayerController opponent)
         {
             this.opponent = opponent;
-
-            FSM = new PlayerFSM(this);
             FSM.RegisterAllStates();
             FSM.RegisterAllConditions();
             FSM.RegisterAllTransitions();
@@ -45,6 +46,11 @@ namespace Boxing
         public void SetInputSource(IInputSource input)
         {
             inputSource = input;
+            InputQueue.ClearAll();
+            if (input == null)
+            {
+                FSM?.SetState<IdleState>();
+            }
         }
 
         void Update()
@@ -66,7 +72,7 @@ namespace Boxing
             {
                 Mana = Mathf.Min(MaxMana, Mana + regenAmount);
                 manaTimer = 0f;
-                Debug.Log($"[{name}] +{regenAmount} mana. Mana = {Mana}");
+                Debug.Log($"[{PlayerName}] +{regenAmount} mana. Mana = {Mana}");
             }
         }
 
@@ -74,7 +80,7 @@ namespace Boxing
         {
             if (Mana < amount) return false;
             Mana -= amount;
-            Debug.Log($"[{name}] -{amount} mana. Mana = {Mana}");
+            Debug.Log($"[{PlayerName}] -{amount} mana. Mana = {Mana}");
             return true;
         }
 
@@ -85,17 +91,17 @@ namespace Boxing
             if (!IsAlive) return;
             if (IsInvincible)
             {
-                Debug.Log($"{name} dodged the attack!");
+                Debug.Log($"{PlayerName} dodged the attack!");
                 return;
             }
             if (FSM.CurrentState is BlockingState)
             {
-                Debug.Log($"{name} blocked the attack!");
+                Debug.Log($"{PlayerName} blocked the attack!");
                 return;
             }
 
             HP -= damage;
-            Debug.Log($"{name} took {damage} damage. HP = {HP}");
+            Debug.Log($"{PlayerName} took {damage} damage. HP = {HP}");
 
             if (HP > 0)
             {
@@ -110,6 +116,7 @@ namespace Boxing
             {
                 IsAlive = false;
                 FSM.SetState<KnockoutState>();
+                OnDefeated?.Invoke(this);
             }
         }
 
@@ -122,6 +129,14 @@ namespace Boxing
             this.MaxMana = maxMana;
             this.Mana = maxMana;
             this.HP = maxHP;
+        }
+
+        public bool xxx = false;
+
+        public bool HasInputSource()
+        {
+            xxx = inputSource != null;
+            return inputSource != null;
         }
     }
 }

@@ -42,11 +42,16 @@ namespace Boxing
             transitions[from].Add(new Transition(() => Get<TTo>(), () => conditions.TryGetValue(cond, out var c) && c()));
         }
 
-        private T Get<T>() where T : PlayerState => (T)cachedStates[typeof(T)];
+        private T Get<T>() where T : PlayerState
+        {
+            return cachedStates.TryGetValue(typeof(T), out var state) ? (T)state : null;
+        }
 
         public void SetState<T>() where T : PlayerState
         {
-            SetState(Get<T>());
+            var state = Get<T>();
+            if (state != null)
+                SetState(state);
         }
 
         public void SetState(PlayerState state)

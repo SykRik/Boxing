@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -16,9 +16,13 @@ namespace Boxing
             public TextMeshProUGUI Name;
             public Slider Health;
             public Slider Power;
+            public Image highlight; // Làm nổi bật nhân vật trên võ đài
         }
 
         public static UIManager Instance;
+
+        private Queue<string> logs = new Queue<string>();
+        private const int maxLogs = 10;
 
         [SerializeField] private Button gameMode1vs1;
         [SerializeField] private Button gameMode1vs2;
@@ -27,6 +31,9 @@ namespace Boxing
         [SerializeField] private Button nextLevel;
         [SerializeField] private Button playAgain;
         [SerializeField] private Button QuitGame;
+        [SerializeField] private Button BackToHome;
+        [SerializeField] private Button SwitchPlayer;
+        [SerializeField] private TextMeshProUGUI logText;
 
         [SerializeField] private UIProfile teamA_Player1;
         [SerializeField] private UIProfile teamA_Player2;
@@ -36,8 +43,13 @@ namespace Boxing
         [SerializeField] private GameObject HUD;
         [SerializeField] private GameObject Home;
         [SerializeField] private GameObject Result;
-
         [SerializeField] private TextMeshProUGUI resultText;
+
+
+        [SerializeField] private Button ATK1;
+        [SerializeField] private Button ATK2;
+        [SerializeField] private Button ATK3;
+        [SerializeField] private Button BLOCK;
 
         private bool showWinUI;
         private bool showLoseUI;
@@ -66,15 +78,100 @@ namespace Boxing
                 playAgain.onClick.AddListener(OnPlayAgainClicked);
             if (QuitGame != null)
                 QuitGame.onClick.AddListener(OnQuitGameClicked);
+            if (BackToHome != null)
+                BackToHome.onClick.AddListener(OnBackToHomeClicked);
+            if (SwitchPlayer != null)
+                SwitchPlayer.onClick.AddListener(OnSwitchPlayerClicked);
+
+            if (ATK1 != null)
+                ATK1.onClick.AddListener(OnATK1Clicked);
+            if (ATK2 != null)
+                ATK2.onClick.AddListener(OnATK2Clicked);
+            if (ATK3 != null)
+                ATK3.onClick.AddListener(OnATK3Clicked);
+            if (BLOCK != null)
+                BLOCK.onClick.AddListener(OnBLOCKClicked);
 
             InitializeUIProfiles();
             ShowHome();
         }
 
+        private void OnBLOCKClicked()
+        {
+            var player = null as PlayerController;
+            if (teamA_Player1.player != null && teamA_Player1.player.HasInputSource())
+            {
+                player = teamA_Player1.player;
+            }
+            if (teamA_Player2.player != null && teamA_Player2.player.HasInputSource())
+            {
+                player = teamA_Player2.player;
+            }
+            if (player != null)
+            {
+                player.InputQueue.Enqueue(ConditionType.IsBlock);
+            }    
+        }
+
+        private void OnATK3Clicked()
+        {
+            var player = null as PlayerController;
+            if (teamA_Player1.player != null && teamA_Player1.player.HasInputSource())
+            {
+                player = teamA_Player1.player;
+            }
+            if (teamA_Player2.player != null && teamA_Player2.player.HasInputSource())
+            {
+                player = teamA_Player2.player;
+            }
+            if (player != null)
+            {
+                player.InputQueue.Enqueue(ConditionType.IsPunchStomach);
+            }
+        }
+
+        private void OnATK2Clicked()
+        {
+            var player = null as PlayerController;
+            if (teamA_Player1.player != null && teamA_Player1.player.HasInputSource())
+            {
+                player = teamA_Player1.player;
+            }
+            if (teamA_Player2.player != null && teamA_Player2.player.HasInputSource())
+            {
+                player = teamA_Player2.player;
+            }
+            if (player != null)
+            {
+                player.InputQueue.Enqueue(ConditionType.IsPunchKidney);
+            }
+        }
+
+        private void OnATK1Clicked()
+        {
+            var player = null as PlayerController;
+            if (teamA_Player1.player != null && teamA_Player1.player.HasInputSource())
+            {
+                player = teamA_Player1.player;
+            }
+            if (teamA_Player2.player != null && teamA_Player2.player.HasInputSource())
+            {
+                player = teamA_Player2.player;
+            }
+            if (player != null)
+            {
+                player.InputQueue.Enqueue(ConditionType.IsPunchHead);
+            }
+        }
+
+        private void Update()
+        {
+            UpdateUIProfiles();
+        }
+
         private void SetGameModeAndStart(GameMode mode)
         {
             GameManager.Instance?.SetGameMode(mode);
-            GameManager.Instance?.StartGame();
             showWinUI = false;
             showLoseUI = false;
             InitializeUIProfiles();
@@ -106,31 +203,6 @@ namespace Boxing
             UpdateUIProfiles();
         }
 
-        public void SetPlayers(List<PlayerController> teamA, List<PlayerController> teamB)
-        {
-            if (teamA_Player1 != null)
-            {
-                teamA_Player1.player = teamA.Count > 0 ? teamA[0] : null;
-                teamA_Player1.root?.SetActive(teamA.Count > 0);
-            }
-            if (teamA_Player2 != null)
-            {
-                teamA_Player2.player = teamA.Count > 1 ? teamA[1] : null;
-                teamA_Player2.root?.SetActive(teamA.Count > 1);
-            }
-            if (teamB_Player1 != null)
-            {
-                teamB_Player1.player = teamB.Count > 0 ? teamB[0] : null;
-                teamB_Player1.root?.SetActive(teamB.Count > 0);
-            }
-            if (teamB_Player2 != null)
-            {
-                teamB_Player2.player = teamB.Count > 1 ? teamB[1] : null;
-                teamB_Player2.root?.SetActive(teamB.Count > 1);
-            }
-            UpdateUIProfiles();
-        }
-
         private void InitializeUIProfiles()
         {
             if (teamA_Player1 != null && teamA_Player1.Health != null)
@@ -153,101 +225,67 @@ namespace Boxing
                 teamB_Player2.Health.minValue = 0;
                 teamB_Player2.Power.minValue = 0;
             }
-            UpdateUIProfiles();
         }
 
         private void UpdateUIProfiles()
         {
-            if (teamA_Player1 != null && teamA_Player1.player != null)
-            {
-                if (teamA_Player1.Name != null)
-                    teamA_Player1.Name.text = teamA_Player1.player.PlayerName ?? "Player 1";
-                if (teamA_Player1.Health != null)
-                {
-                    teamA_Player1.Health.maxValue = teamA_Player1.player.MaxHP;
-                    teamA_Player1.Health.value = teamA_Player1.player.HP;
-                }
-                if (teamA_Player1.Power != null)
-                {
-                    teamA_Player1.Power.maxValue = teamA_Player1.player.MaxMana;
-                    teamA_Player1.Power.value = teamA_Player1.player.Mana;
-                }
-            }
-            else if (teamA_Player1 != null)
-            {
-                if (teamA_Player1.Name != null) teamA_Player1.Name.text = "";
-                if (teamA_Player1.Health != null) teamA_Player1.Health.value = 0;
-                if (teamA_Player1.Power != null) teamA_Player1.Power.value = 0;
-                if (teamA_Player1.root != null) teamA_Player1.root.SetActive(false);
-            }
+            UpdateUIProfile(teamA_Player1, "Player 1");
+            UpdateUIProfile(teamA_Player2, "Player 2");
+            UpdateUIProfile(teamB_Player1, "Opponent 1");
+            UpdateUIProfile(teamB_Player2, "Opponent 2");
+        }
 
-            if (teamA_Player2 != null && teamA_Player2.player != null)
+        private void UpdateUIProfile(UIProfile profile, string defaultName)
+        {
+            if (profile != null && profile.player != null)
             {
-                if (teamA_Player2.Name != null)
-                    teamA_Player2.Name.text = teamA_Player2.player.PlayerName ?? "Player 2";
-                if (teamA_Player2.Health != null)
+                if (profile.Name != null)
+                    profile.Name.text = profile.player.PlayerName ?? defaultName;
+                if (profile.Health != null)
                 {
-                    teamA_Player2.Health.maxValue = teamA_Player2.player.MaxHP;
-                    teamA_Player2.Health.value = teamA_Player2.player.HP;
+                    profile.Health.maxValue = profile.player.MaxHP;
+                    profile.Health.value = profile.player.HP;
                 }
-                if (teamA_Player2.Power != null)
+                if (profile.Power != null)
                 {
-                    teamA_Player2.Power.maxValue = teamA_Player2.player.MaxMana;
-                    teamA_Player2.Power.value = teamA_Player2.player.Mana;
+                    profile.Power.maxValue = profile.player.MaxMana;
+                    profile.Power.value = profile.player.Mana;
+                }
+                if (profile.highlight != null)
+                {
+                    profile.highlight.enabled = profile.player.HasInputSource();
+                }
+                var canvasGroup = profile.root?.GetComponent<CanvasGroup>();
+                if (canvasGroup != null)
+                {
+                    canvasGroup.alpha = profile.player.IsAlive ? 1f : 0.5f;
                 }
             }
-            else if (teamA_Player2 != null)
+            else if (profile != null)
             {
-                if (teamA_Player2.Name != null) teamA_Player2.Name.text = "";
-                if (teamA_Player2.Health != null) teamA_Player2.Health.value = 0;
-                if (teamA_Player2.Power != null) teamA_Player2.Power.value = 0;
-                if (teamA_Player2.root != null) teamA_Player2.root.SetActive(false);
+                if (profile.Name != null) profile.Name.text = "";
+                if (profile.Health != null) profile.Health.value = 0;
+                if (profile.Power != null) profile.Power.value = 0;
+                if (profile.highlight != null) profile.highlight.enabled = false;
+                if (profile.root != null) profile.root.SetActive(false);
+                var canvasGroup = profile.root?.GetComponent<CanvasGroup>();
+                if (canvasGroup != null) canvasGroup.alpha = 1f;
             }
+        }
 
-            if (teamB_Player1 != null && teamB_Player1.player != null)
-            {
-                if (teamB_Player1.Name != null)
-                    teamB_Player1.Name.text = teamB_Player1.player.PlayerName ?? "Opponent 1";
-                if (teamB_Player1.Health != null)
-                {
-                    teamB_Player1.Health.maxValue = teamB_Player1.player.MaxHP;
-                    teamB_Player1.Health.value = teamB_Player1.player.HP;
-                }
-                if (teamB_Player1.Power != null)
-                {
-                    teamB_Player1.Power.maxValue = teamB_Player1.player.MaxMana;
-                    teamB_Player1.Power.value = teamB_Player1.player.Mana;
-                }
-            }
-            else if (teamB_Player1 != null)
-            {
-                if (teamB_Player1.Name != null) teamB_Player1.Name.text = "";
-                if (teamB_Player1.Health != null) teamB_Player1.Health.value = 0;
-                if (teamB_Player1.Power != null) teamB_Player1.Power.value = 0;
-                if (teamB_Player1.root != null) teamB_Player1.root.SetActive(false);
-            }
+        public void Log(string message)
+        {
+            if (logs.Count >= maxLogs)
+                logs.Dequeue();
+            logs.Enqueue(message);
+            UpdateLogDisplay();
+        }
 
-            if (teamB_Player2 != null && teamB_Player2.player != null)
+        private void UpdateLogDisplay()
+        {
+            if (logText != null)
             {
-                if (teamB_Player2.Name != null)
-                    teamB_Player2.Name.text = teamB_Player2.player.PlayerName ?? "Opponent 2";
-                if (teamB_Player2.Health != null)
-                {
-                    teamB_Player2.Health.maxValue = teamB_Player2.player.MaxHP;
-                    teamB_Player2.Health.value = teamB_Player2.player.HP;
-                }
-                if (teamB_Player2.Power != null)
-                {
-                    teamB_Player2.Power.maxValue = teamB_Player2.player.MaxMana;
-                    teamB_Player2.Power.value = teamB_Player2.player.Mana;
-                }
-            }
-            else if (teamB_Player2 != null)
-            {
-                if (teamB_Player2.Name != null) teamB_Player2.Name.text = "";
-                if (teamB_Player2.Health != null) teamB_Player2.Health.value = 0;
-                if (teamB_Player2.Power != null) teamB_Player2.Power.value = 0;
-                if (teamB_Player2.root != null) teamB_Player2.root.SetActive(false);
+                logText.text = string.Join("\n", logs);
             }
         }
 
@@ -265,6 +303,18 @@ namespace Boxing
             ShowResult("YOU LOSE!");
         }
 
+        public void ShowResult(string message)
+        {
+            if (Home != null) Home.SetActive(false);
+            if (HUD != null) HUD.SetActive(false);
+            if (Result != null) Result.SetActive(true);
+            if (resultText != null) resultText.text = message;
+
+            if (nextLevel != null) nextLevel.gameObject.SetActive(showWinUI);
+            if (playAgain != null) playAgain.gameObject.SetActive(showLoseUI);
+            if (QuitGame != null) QuitGame.gameObject.SetActive(true);
+        }
+
         private void ShowHome()
         {
             if (Home != null) Home.SetActive(true);
@@ -277,18 +327,6 @@ namespace Boxing
             if (Home != null) Home.SetActive(false);
             if (HUD != null) HUD.SetActive(true);
             if (Result != null) Result.SetActive(false);
-        }
-
-        private void ShowResult(string message)
-        {
-            if (Home != null) Home.SetActive(false);
-            if (HUD != null) HUD.SetActive(false);
-            if (Result != null) Result.SetActive(true);
-            if (resultText != null) resultText.text = message;
-
-            if (nextLevel != null) nextLevel.gameObject.SetActive(showWinUI);
-            if (playAgain != null) playAgain.gameObject.SetActive(showLoseUI);
-            if (QuitGame != null) QuitGame.gameObject.SetActive(true);
         }
 
         private void OnNextLevelClicked()
@@ -313,8 +351,17 @@ namespace Boxing
             ShowHome();
         }
 
-        private void Update()
+        private void OnBackToHomeClicked()
         {
+            showWinUI = false;
+            showLoseUI = false;
+            GameManager.Instance?.QuitGame();
+            ShowHome();
+        }
+
+        private void OnSwitchPlayerClicked()
+        {
+            GameManager.Instance?.SwitchPlayer();
             UpdateUIProfiles();
         }
     }

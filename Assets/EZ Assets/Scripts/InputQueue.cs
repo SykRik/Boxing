@@ -58,5 +58,10 @@ namespace Boxing
 
             return false;
         }
+
+        public void ClearAll()
+        {
+            queue.Clear();
+        }
     }
 }
