@@ -1,5 +1,4 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Boxing
 {
@@ -124,6 +123,5 @@ namespace Boxing
             this.Mana = maxMana;
             this.HP = maxHP;
         }
-
     }
 }

@@ -1,7 +1,4 @@
-﻿using UnityEngine;
-using UnityEngine.InputSystem;
-
-namespace Boxing
+﻿namespace Boxing
 {
     public class UserInput : IInputSource
     {
