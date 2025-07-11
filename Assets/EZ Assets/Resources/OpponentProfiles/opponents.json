@@ -1,14 +1,14 @@
 {
   "opponents": [
-    { "OpponentName": "Fighter01", "MaxHP": 80,  "MaxMana": 20 },
-    { "OpponentName": "Fighter02", "MaxHP": 90,  "MaxMana": 25 },
-    { "OpponentName": "Fighter03", "MaxHP": 100, "MaxMana": 30 },
-    { "OpponentName": "Fighter04", "MaxHP": 110, "MaxMana": 35 },
-    { "OpponentName": "Fighter05", "MaxHP": 120, "MaxMana": 40 },
-    { "OpponentName": "Fighter06", "MaxHP": 130, "MaxMana": 45 },
-    { "OpponentName": "Fighter07", "MaxHP": 140, "MaxMana": 50 },
-    { "OpponentName": "Fighter08", "MaxHP": 150, "MaxMana": 55 },
-    { "OpponentName": "Fighter09", "MaxHP": 160, "MaxMana": 60 },
-    { "OpponentName": "Fighter10", "MaxHP": 180, "MaxMana": 70 }
+    { "OpponentName": "Fighter01", "MaxHP": 50,  "MaxMana": 20 },
+    { "OpponentName": "Fighter02", "MaxHP": 60,  "MaxMana": 25 },
+    { "OpponentName": "Fighter03", "MaxHP": 70, "MaxMana": 30 },
+    { "OpponentName": "Fighter04", "MaxHP": 80, "MaxMana": 35 },
+    { "OpponentName": "Fighter05", "MaxHP": 90, "MaxMana": 40 },
+    { "OpponentName": "Fighter06", "MaxHP": 100, "MaxMana": 45 },
+    { "OpponentName": "Fighter07", "MaxHP": 110, "MaxMana": 50 },
+    { "OpponentName": "Fighter08", "MaxHP": 120, "MaxMana": 55 },
+    { "OpponentName": "Fighter09", "MaxHP": 130, "MaxMana": 60 },
+    { "OpponentName": "Fighter10", "MaxHP": 140, "MaxMana": 70 }
   ]
 }

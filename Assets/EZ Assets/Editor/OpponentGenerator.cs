@@ -18,8 +18,8 @@ namespace Boxing.Editor
                 opponents.Add(new CharacterProfile
                 {
                     OpponentName = $"Fighter{i:00}",
-                    MaxHP = 70 + i * 10,
-                    MaxMana = 10 + i * 5
+                    MaxHP = 50 + i * 10,
+                    MaxMana = 20 + i * 5
                 });
             }
 

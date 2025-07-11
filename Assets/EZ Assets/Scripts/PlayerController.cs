@@ -9,7 +9,7 @@ namespace Boxing
         public GameObject modelHolder = null;
 
         public string PlayerName;
-        public int MaxHP = 150;
+        public int MaxHP = 100;
         public int MaxMana = 100;
 
         public int HP { get; private set; }
